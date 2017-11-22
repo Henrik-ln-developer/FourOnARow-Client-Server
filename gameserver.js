@@ -40,43 +40,42 @@ gameserver.post('/move', (req, res) => {
     .then(JSON.parse)
     .then( ({ x, y, gameNumber }) => {
         const game = games[gameNumber]
+        console.log("Wanted move: X: " + x + ", Y: " + y)
         if (game.legalMove(x,y)) 
         {
             console.log("Is legal move")
             const myMove = game.getMove(x, y)
             console.log("MY MOVE: X: " + myMove.x + ", Y: " + myMove.y)
             const afterMove = game.makeMove(x, y)
-            console.log("Board after move: " + afterMove.board)
+            /*console.log("Board after My Move: ")
             for(var i = 0; i < afterMove.board.length; i++) {
                 var row = afterMove.board[i];
                 for(var j = 0; j < row.length; j++) {
                     console.log("Tile[" + i + "][" + j + "] = " + row[j]);
                 }
-            }
+            }*/
 
             const aiMove = ai(afterMove)
-            if (aiMove) 
+            const realAiMove = afterMove.getMove(aiMove.x, aiMove.y)
+            if (realAiMove) 
             {
-                console.log("AI made a move")
-                const afterAI = afterMove.makeMove(aiMove.x, aiMove.y)
-                console.log("Board after AI: " + afterAI.board)
-                console.log("Board after AI: ")
+                const afterAI = afterMove.makeMove(realAiMove.x, realAiMove.y)
+                /*console.log("Board after AI Move: ")
                 for(var i = 0; i < afterAI.board.length; i++) {
                     var row = afterAI.board[i];
                     for(var j = 0; j < row.length; j++) {
                         console.log("Tile[" + i + "][" + j + "] = " + row[j]);
                     }
-                }
+                }*/
                 games[gameNumber] = afterAI
                 res.send(JSON.stringify({ 
-                    moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}, Object.assign(aiMove, { player: afterMove.playerInTurn() })], 
+                    moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}, Object.assign(realAiMove, { player: afterMove.playerInTurn() })], 
                     inTurn: afterAI.playerInTurn(), 
                     winner: afterAI.winner(), 
                     stalemate: afterAI.stalemate() }))
             } 
             else 
             {
-                console.log("No AI move")
                 games[gameNumber] = afterMove
                 res.send(JSON.stringify({ 
                     moves: [{x, y, player: game.playerInTurn()}], 

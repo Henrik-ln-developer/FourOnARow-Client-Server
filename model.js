@@ -1,18 +1,9 @@
 const model = (() => {
     const array = (length, init) => Array.apply(null, new Array(length)).map(init || (_ => undefined))
-    
-    /*const array = (length, init) => Array.apply(null, new Array(length)).map
-    (
-        function()
-        {
-            return new Array(7).map(init || (_ => undefined));
-        }
-    )*/
 
     //const updateArray = (a, i, f) => a.map((e, j) => (i === j) ? f(e, j) : e)
     const updateArray = function(a, i, f)
     {
-        console.log("UpdateArray called")
         return a.map((e, j) => (i === j) ? f(e, j) : e)
     }
 
@@ -33,7 +24,7 @@ const model = (() => {
             const w = winningRow(candidate)
             return w && { winner: candidate, row : w }
         }
-        const winner = () => getWinner('X') || getWinner('O')
+        const winner = () => getWinner('Red') || getWinner('Blue')
         const stalemate = () => plateFull && !winner()
         
         const playerInTurn = () => inTurn
@@ -42,11 +33,10 @@ const model = (() => {
             
             if (x < 0 || y < 0 || x > 5 || y > 6) return false
             if (winner()) return false
-            for(var i = 0; i < 6; i++)
+            for(var i = x; i < 6; i++)
             {
                 if (!tile(i, y))
                 {
-                    console.log("Empty spot at: {X: " + i + ", Y: " + y + "}")
                     return true;
                 }
             }
@@ -64,14 +54,13 @@ const model = (() => {
                     //console.log("Putting mark in: {X: " + dx + ", Y: " + y + "}")
                 }
             }
-            console.log("Putting mark in: {X: " + dx + ", Y: " + y + "}")
-            return createModel(setTile(board, dx, y, inTurn), (inTurn === 'X') ? 'O' : 'X', gameNumber)
+            return createModel(setTile(board, dx, y, inTurn), (inTurn === 'Red') ? 'Blue' : 'Red', gameNumber)
         }
 
         const getMove = (x, y) => {
             if (!legalMove(x, y)) throw 'Illegal move'
             var dx = -1
-            for(var i = 0; i < 6; i++)
+            for(var i = x; i < 6; i++)
             {
                 if (!tile(i, y))
                 {
@@ -79,7 +68,6 @@ const model = (() => {
                     //console.log("Putting mark in: {X: " + dx + ", Y: " + y + "}")
                 }
             }
-            console.log("Get Move: {X: " + dx + ", Y: " + y + "}")
             return {x : dx, y : y}
         }
         
@@ -88,7 +76,7 @@ const model = (() => {
         return { tile, winner, stalemate, playerInTurn, legalMove, makeMove, getMove, board, json, gameNumber }
     }
 
-    return gameNumber => createModel(array(6, _ => array(7)), 'X', gameNumber)
+    return gameNumber => createModel(array(6, _ => array(7)), 'Red', gameNumber)
 })()
 
 module.exports = model
