@@ -25,7 +25,7 @@ function view(model, dispatch) {
     }    
     
     return div(null, 
-    h1(null, 'Tic-tac-toe'), 
+    h1(null, 'Four in a row'), 
     createMessage(model), 
     createBoard(model), 
     button({ id: 'reset', onClick: () => dispatch({type: "reset", gameNumber: model.gameNumber}) }, 'Reset'));

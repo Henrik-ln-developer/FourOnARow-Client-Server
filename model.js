@@ -11,17 +11,17 @@ const model = (() => {
         const setTile = (board, x, y, value) => updateArray(board, x, row => updateArray(row, y, _ => value))
         const tile = (x, y) => board[x][y]
         
-        const row = (x, y, dx, dy) => array(board.length, (_, i) => ({x: x + i * dx, y: y + i * dy}))
-        const verticalRows = array(board.length, (_, i) => row(0, i, 1, 0))
-        const horizontalRows = array(board.length, (_, i) => row(i, 0, 0, 1))
-        const diagonalRows = [row(0, 0, 1, 1), row(0, 2, 1, -1)]
+        const verticalrow = (x, y, dx, dy) => array(board.length, (_, i) => ({x: x + i * dx, y: y + i * dy}))
+        const horizontalRow = (x, y, dx, dy) => array(board[0].length, (_, i) => ({x: x + i * dx, y: y + i * dy}))
+        const diagonalrow = (x, y, dx, dy, length) => array(length, (_, i) => ({x: x + i * dx, y: y + i * dy}))
+        const verticalRows = array(board[0].length, (_, i) => verticalrow(0, i, 1, 0))
+        const horizontalRows = array(board.length, (_, i) => horizontalRow(i, 0, 0, 1))
+        const diagonalRows = [diagonalrow(2, 0, 1, 1, 4), diagonalrow(1, 0, 1, 1, 5), diagonalrow(0, 0, 1, 1, 6), diagonalrow(0, 1, 1, 1, 6), diagonalrow(0, 2, 1, 1, 5), diagonalrow(0, 3, 1, 1, 4), 
+            diagonalrow(0, 3, 1, -1, 4), diagonalrow(0, 4, 1, -1, 5), diagonalrow(0, 5, 1, -1, 6), diagonalrow(0, 6, 1, -1, 6), diagonalrow(1, 6, 1, -1, 5, diagonalrow(2, 6, 1, -1, 4))]
         const allRows = verticalRows.concat(horizontalRows).concat(diagonalRows)
         const plateFull = board.every(row => row.every(x => x))
-        
-        //const hasWon = (theRow, candidate) =>  theRow.every(({x, y}) => tile(x, y) === candidate)
         const hasWon = function(theRow, candidate)
         {
-            //return theRow.every(({x, y}) => tile(x, y) === candidate)
             var count = 0;
             for(var i = 0; i < theRow.length; i++)
             {
@@ -72,7 +72,6 @@ const model = (() => {
                 if (!tile(i, y))
                 {
                     dx = i;
-                    //console.log("Putting mark in: {X: " + dx + ", Y: " + y + "}")
                 }
             }
             return createModel(setTile(board, dx, y, inTurn), (inTurn === 'Red') ? 'Blue' : 'Red', gameNumber)
@@ -86,14 +85,12 @@ const model = (() => {
                 if (!tile(i, y))
                 {
                     dx = i;
-                    //console.log("Putting mark in: {X: " + dx + ", Y: " + y + "}")
                 }
             }
             return {x : dx, y : y}
         }
         
         const json = () => JSON.stringify({board, inTurn, winner: winner(), stalemate: stalemate(), gameNumber})
-        
         return { tile, winner, stalemate, playerInTurn, legalMove, makeMove, getMove, board, json, gameNumber }
     }
 
