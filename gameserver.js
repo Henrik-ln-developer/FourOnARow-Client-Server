@@ -41,44 +41,52 @@ gameserver.post('/move', (req, res) => {
     .then( ({ x, y, gameNumber }) => {
         const game = games[gameNumber]
         console.log("Wanted move: X: " + x + ", Y: " + y)
+        console.log("Board state: ")
+            for(var i = 0; i < game.board.length; i++) {
+                var row = game.board[i];
+                for(var j = 0; j < row.length; j++) {
+                    console.log("Tile[" + i + "][" + j + "] = " + row[j]);
+                }
+            }
         if (game.legalMove(x,y)) 
         {
             console.log("Is legal move")
             const myMove = game.getMove(x, y)
-            console.log("MY MOVE: X: " + myMove.x + ", Y: " + myMove.y)
+            console.log("Real move: X: " + myMove.x + ", Y: " + myMove.y)
             const afterMove = game.makeMove(x, y)
-            /*console.log("Board after My Move: ")
-            for(var i = 0; i < afterMove.board.length; i++) {
-                var row = afterMove.board[i];
-                for(var j = 0; j < row.length; j++) {
-                    console.log("Tile[" + i + "][" + j + "] = " + row[j]);
-                }
-            }*/
-
             const aiMove = ai(afterMove)
-            const realAiMove = afterMove.getMove(aiMove.x, aiMove.y)
-            if (realAiMove) 
+            if(aiMove)
             {
-                const afterAI = afterMove.makeMove(realAiMove.x, realAiMove.y)
-                /*console.log("Board after AI Move: ")
-                for(var i = 0; i < afterAI.board.length; i++) {
-                    var row = afterAI.board[i];
-                    for(var j = 0; j < row.length; j++) {
-                        console.log("Tile[" + i + "][" + j + "] = " + row[j]);
-                    }
-                }*/
-                games[gameNumber] = afterAI
-                res.send(JSON.stringify({ 
-                    moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}, Object.assign(realAiMove, { player: afterMove.playerInTurn() })], 
-                    inTurn: afterAI.playerInTurn(), 
-                    winner: afterAI.winner(), 
-                    stalemate: afterAI.stalemate() }))
-            } 
-            else 
+                console.log("Random AI move: X: " + aiMove.x + ", Y: " + aiMove.y)
+                const realAiMove = afterMove.getMove(aiMove.x, aiMove.y)
+                if (realAiMove) 
+                {
+                    console.log("Real AI move: X: " + realAiMove.x + ", Y: " + realAiMove.y)
+                    const afterAI = afterMove.makeMove(realAiMove.x, realAiMove.y)
+                    games[gameNumber] = afterAI
+                    res.send(JSON.stringify({ 
+                        moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}, Object.assign(realAiMove, { player: afterMove.playerInTurn() })], 
+                        inTurn: afterAI.playerInTurn(), 
+                        winner: afterAI.winner(), 
+                        stalemate: afterAI.stalemate() }))
+                } 
+                else 
+                {
+                    console.log("No legal AI move 2")
+                    games[gameNumber] = afterMove
+                    res.send(JSON.stringify({ 
+                        moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}], 
+                        inTurn: afterMove.playerInTurn(), 
+                        winner: afterMove.winner(), 
+                        stalemate: afterMove.stalemate()  }))
+                }
+            }
+            else
             {
+                console.log("No legal AI move")
                 games[gameNumber] = afterMove
                 res.send(JSON.stringify({ 
-                    moves: [{x, y, player: game.playerInTurn()}], 
+                    moves: [{x : myMove.x, y : myMove.y, player: game.playerInTurn()}], 
                     inTurn: afterMove.playerInTurn(), 
                     winner: afterMove.winner(), 
                     stalemate: afterMove.stalemate()  }))

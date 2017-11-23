@@ -5,7 +5,6 @@ module.exports = model => {
     function winningMove(model) {
         const legal_moves = moves.filter(({x, y}) => model.legalMove(x, y))
         var aiMove = legal_moves[Math.floor(Math.random() * legal_moves.length)]
-        console.log("AI MOVE: X: " + aiMove.x + ", Y: " + aiMove.y)
         return aiMove;
         /*return legal_moves.find(({x, y}) => {
             const moved = model.makeMove(x, y)

@@ -18,7 +18,29 @@ const model = (() => {
         const allRows = verticalRows.concat(horizontalRows).concat(diagonalRows)
         const plateFull = board.every(row => row.every(x => x))
         
-        const hasWon = (theRow, candidate) =>  theRow.every(({x, y}) => tile(x, y) === candidate)
+        //const hasWon = (theRow, candidate) =>  theRow.every(({x, y}) => tile(x, y) === candidate)
+        const hasWon = function(theRow, candidate)
+        {
+            //return theRow.every(({x, y}) => tile(x, y) === candidate)
+            var count = 0;
+            for(var i = 0; i < theRow.length; i++)
+            {
+                if(tile(theRow[i].x, theRow[i].y)  === candidate)
+                {
+                    count++
+                }
+                else
+                {
+                    count = 0
+                }
+                if(count >= 4)
+                {
+                    return true
+                }
+            }
+            return false
+        }
+        
         const winningRow = (candidate) => allRows.find(x => hasWon(x, candidate))
         const getWinner = (candidate) => {
             const w = winningRow(candidate)
@@ -30,7 +52,6 @@ const model = (() => {
         const playerInTurn = () => inTurn
         
         const legalMove = (x, y) => {
-            
             if (x < 0 || y < 0 || x > 5 || y > 6) return false
             if (winner()) return false
             for(var i = x; i < 6; i++)
